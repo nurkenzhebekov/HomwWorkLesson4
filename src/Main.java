@@ -6,7 +6,8 @@ public class Main {
     public static String bossDefence;
     public static int[] heroesHealth = {280, 270, 250, 300};
     public static int[] heroesDamage = {10, 15, 20, 0};
-    public static String[] heroesAttackType = {"Physical", "Magical", "Kinetic", "Medical"};
+    public static int[] medicHealAmount = {30};
+    public static String[] heroesAttackType = {"Physical", "Magical", "Kinetic", "Healing"};
     public static int roundNumber;
 
     public static void main(String[] args) {
@@ -21,6 +22,7 @@ public class Main {
         chooseBossDefence();
         bossAttack();
         heroesAttack();
+        healTeammate();
         printStatistics();
     }
 
@@ -31,7 +33,6 @@ public class Main {
     }
 
     public static void heroesAttack() {
-        boolean medicHealed = false;
         for (int i = 0; i < heroesDamage.length; i++) {
             if (heroesHealth[i] > 0 && bossHealth > 0) {
                 int damage = heroesDamage[i];
@@ -42,7 +43,13 @@ public class Main {
                     System.out.println("Critical damage: " + damage);
                 }
 
-                if (heroesAttackType[i].equals("Medical") && !medicHealed) {
+                if (bossHealth - damage < 0) {
+                    bossHealth = 0;
+                } else {
+                    bossHealth = bossHealth - damage;
+                }
+
+                /*if (heroesAttackType[i].equals("Medical") && !medicHealed) {
                     healTeammate();
                     medicHealed = true;
                 } else {
@@ -50,33 +57,35 @@ public class Main {
                         bossHealth = 0;
                     } else {
                         bossHealth = bossHealth - damage;
-                    }
-                }
+                    } */
             }
         }
     }
+
     public static void bossAttack() {
         for (int i = 0; i < heroesHealth.length; i++) {
             if (heroesHealth[i] > 0) {
                 if (heroesHealth[i] - bossDamage < 0) {
                     heroesHealth[i] = 0;
                 } else {
-                    heroesHealth[i] -= bossDamage;
+                    heroesHealth[i] = heroesHealth[i] - bossDamage;
                 }
             }
         }
     }
 
     public static void healTeammate() {
-        Random random = new Random();
-        int targetIndex = random.nextInt(heroesHealth.length - 1);
-        int healingAmount = 30;
+        int lowHPHeroIndex = -1;
+        for (int i = 0; i < heroesHealth.length; i++) {
+            if (heroesHealth[i] > 0 && heroesHealth[i] < 100) {
+                lowHPHeroIndex = i;
+                break;
+            }
+        }
 
-        if (heroesHealth[targetIndex] < 100) {
-            heroesHealth[targetIndex] += healingAmount;
-            System.out.println("Medic healed " + heroesAttackType[targetIndex] + " for " + healingAmount + " health.");
-        } else {
-            System.out.println("Medic tried to heal, but the teammate is already healthy.");
+        if (lowHPHeroIndex != -1 && heroesHealth[3] > 0) {
+            heroesHealth[lowHPHeroIndex] += medicHealAmount[0];
+            System.out.println("Medic healed " + heroesAttackType[lowHPHeroIndex] + " for " + medicHealAmount[0] + " health.");
         }
     }
 
@@ -91,7 +100,7 @@ public class Main {
         }
         return false;*/
         boolean allHeroesDead = true;
-        for (int i = 0; i < heroesHealth.length; i++) {
+        for (int i = 0; i < heroesHealth.length - 1; i++) {
             if (heroesHealth[i] > 0) {
                 allHeroesDead = false;
                 break;
